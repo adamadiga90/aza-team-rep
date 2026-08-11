@@ -2,8 +2,9 @@
 import { useEffect, useState } from 'react';
 import { getTranslator, type Locale } from '@/lib/i18n';
 import { logger } from '@/lib/logger';
-import { dataURItoByteString } from 'react-pdf/dist/shared/utils.js';
-
+// import { dataURItoByteString } from 'react-pdf/dist/shared/utils.js';
+import 'react-pdf/dist/Page/TextLayer.css';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
 type PdfModule = typeof import('react-pdf');
 
 export default function PdfViewer({ file, locale }: { file: string; locale: Locale }) {
