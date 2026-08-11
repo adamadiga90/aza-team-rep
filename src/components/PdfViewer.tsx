@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { getTranslator, type Locale } from '@/lib/i18n';
 import { logger } from '@/lib/logger';
+import { dataURItoByteString } from 'react-pdf/dist/shared/utils.js';
 
 type PdfModule = typeof import('react-pdf');
 
@@ -108,7 +109,7 @@ export default function PdfViewer({ file, locale }: { file: string; locale: Loca
               setFailed(true);
             }}
           >
-            <Page pageNumber={pageNumber} width={fitWidth * zoom} />
+            <Page pageNumber={pageNumber}  width={fitWidth * zoom} className={"flex overflow-hidden  "} />
           </Document>
         )}
       </div>
