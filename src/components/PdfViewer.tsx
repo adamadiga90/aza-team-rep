@@ -7,9 +7,13 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 type PdfModule = typeof import('react-pdf');
 
+const MAX_FETCH_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 400;
+
 export default function PdfViewer({ file, locale }: { file: string; locale: Locale }) {
   const t = getTranslator(locale);
   const [pdf, setPdf] = useState<PdfModule | null>(null);
+  const [data, setData] = useState<ArrayBuffer | null>(null);
   const [failed, setFailed] = useState(false);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -35,6 +39,44 @@ export default function PdfViewer({ file, locale }: { file: string; locale: Loca
     };
   }, []);
 
+  // نجلب البايتات بأنفسنا (GET عادي بلا Range) ونتجاوز طبقة الشبكة داخل pdf.js،
+  // مع إعادة محاولة واحدة عند أي استجابة 204.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
+        try {
+          const res = await fetch(file, { credentials: 'same-origin' });
+          if (res.status === 204) {
+            logger.warn('viewer.fetch_204', { file, attempt });
+            if (attempt < MAX_FETCH_ATTEMPTS) {
+              await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+              continue;
+            }
+            throw new Error('HTTP 204 No Content');
+          }
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const buf = await res.arrayBuffer();
+          if (active) {
+            setData(buf);
+            setFailed(false);
+          }
+          return;
+        } catch (err) {
+          logger.error('viewer.fetch_failed', {
+            file,
+            attempt,
+            message: err instanceof Error ? err.message : String(err),
+          });
+          if (active && attempt === MAX_FETCH_ATTEMPTS) setFailed(true);
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [file]);
+
   useEffect(() => {
     function update() {
       setFitWidth(Math.max(280, Math.min(window.innerWidth - 40, 860)));
@@ -44,7 +86,8 @@ export default function PdfViewer({ file, locale }: { file: string; locale: Loca
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  if (!pdf) return <p className="text-gray-500 dark:text-gray-400">{t('viewer.loading')}</p>;
+  if (!pdf || !data)
+    return <p className="text-gray-500 dark:text-gray-400">{t('viewer.loading')}</p>;
   const { Document, Page } = pdf;
 
   return (
@@ -98,7 +141,7 @@ export default function PdfViewer({ file, locale }: { file: string; locale: Loca
           <p className="text-red-600">{t('viewer.invalid')}</p>
         ) : (
           <Document
-            file={file}
+            file={data}
             onLoadSuccess={(p) => {
               logger.info('viewer.loaded', { file, numPages: p.numPages });
               setNumPages(p.numPages);
@@ -110,7 +153,7 @@ export default function PdfViewer({ file, locale }: { file: string; locale: Loca
               setFailed(true);
             }}
           >
-            <Page pageNumber={pageNumber}  width={fitWidth * zoom} className={"flex overflow-hidden  "} />
+            <Page pageNumber={pageNumber}  width={fitWidth * zoom} className={"flex overflow-hidden"} />
           </Document>
         )}
       </div>

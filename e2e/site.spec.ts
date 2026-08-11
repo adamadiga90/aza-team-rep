@@ -28,6 +28,32 @@ test('pdf viewer renders a document canvas', async ({ page }) => {
   await expect(page.locator('.react-pdf__Page__canvas')).toBeVisible({ timeout: 30_000 });
 });
 
+test('pdf viewer loads the file itself with a plain GET, no Range header', async ({ page }) => {
+  const ranges: (string | null)[] = [];
+  await page.route('**/docs/*.pdf', async (route) => {
+    ranges.push(route.request().headers()['range'] ?? null);
+    await route.continue();
+  });
+  await page.goto('/ar/docs/code-of-conduct/');
+  await expect(page.locator('.react-pdf__Page__canvas')).toBeVisible({ timeout: 30_000 });
+  expect(ranges.every((r) => r === null)).toBe(true);
+});
+
+test('pdf viewer retries once when the server responds 204', async ({ page }) => {
+  let calls = 0;
+  await page.route('**/docs/*.pdf', async (route) => {
+    calls++;
+    if (calls === 1) {
+      await route.fulfill({ status: 204, contentType: 'application/pdf' });
+    } else {
+      await route.continue();
+    }
+  });
+  await page.goto('/ar/docs/code-of-conduct/');
+  await expect(page.locator('.react-pdf__Page__canvas')).toBeVisible({ timeout: 30_000 });
+  expect(calls).toBeGreaterThanOrEqual(2);
+});
+
 test('pdf viewer shows page counter and zoom works', async ({ page }) => {
   await page.goto('/ar/docs/code-of-conduct/');
   await expect(page.locator('.react-pdf__Page__canvas')).toBeVisible({ timeout: 30_000 });

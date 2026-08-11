@@ -108,14 +108,14 @@ project/
 معايير القبول (مثبتة آلياً، 2026-08-11):
 
 - `npm run build` ✓ + `npm run typecheck` ✓ (19 صفحة).
-- `npm run test:e2e` ✓ 9/9: تحويل الجذر، lang/dir، قائمة 4 وثائق، **عارض PDF يعرض canvas فعلياً** (react-pdf 5.4.296 + worker مطابق)، عدّاد صفحات + تكبير، تحقق الاستمارة، إرسال ناجح عبر interception إلى Formspree، 404، لا أخطاء كونسول.
+- `npm run test:e2e` ✓ 11/11: تحويل الجذر، lang/dir، قائمة 4 وثائق، **عارض PDF يعرض canvas فعلياً** (react-pdf 5.4.296 + worker مطابق)، جلب بلا `Range`، إعادة محاولة عند 204، عدّاد صفحات + تكبير، تحقق الاستمارة، إرسال ناجح عبر interception إلى Formspree، 404، لا أخطاء كونسول.
 - `npm run test:perf` ✓ (Lighthouse ≥90): home 100/100/100/100، join 97، docs 98 (a11y 100 في كل الصفحات).
 - `npm run preview` = يخدم `out/` كخادم static حقيقي على :4325.
 
 ملاحظات QA:
 - `test:e2e` يبني `out/` بـ endpoint وهمي (`/f/e2e-mock`) — `out/` مُتجاهَل ولا يُنشر أبداً؛ Vercel يعيد البناء بـ env الحقيقي.
 - قصة خطأ موثقة: ترقية pdfjs-dist الحرة → `UnknownErrorException: API version does not match Worker version` (react-pdf يثبّت pdfjs-dist `5.4.296` حرفياً). الحل: تثبيت حرفي + إعادة نسخ worker (انظر TECH_STACK).
-- خطأ بيئي موثق: `ResponseException: Unexpected server response (204)` عند فتح وثيقة **تحت `next dev` فقط** (خادم Turbopack يرد فعلياً 206/200 على الـ PDF — مُقاس بفعالية؛ والملفات والإنتاج سليمان). **حاولناه ونبذناه**: إضافة `options={{ disableRange: true }}` تحوّل طلب pdfjs لـ GET كامل لكنها تُسقط العارض بشكل متقطع (انهيار worker `sendWithPromise` في pdfjs 5.4.296) — Regression مثبتة e2e، لذلك مُتراجع عنها. **الطريق الموثوق للتحقق البصري: `npm run preview`** (يخدم نسخة الإنتاج `out/` حيث العارض يعمل 9/9)، وتحت dev: تحديث كامل Ctrl+Shift+R أو نافذة خصوصية لاستبعاد تدخل امتداد متصفح.
+- قصة خطأ موثقة: `ResponseException: Unexpected server response (204)` كان يظهر تحت `next dev` وبعض المتصفحات (امتدادات/وكلاء يعترضون طلبات `Range` لمحتوى التحميل). **الحل المعماري المعتمد**: `PdfViewer` يجلب بايتات الـ PDF بنفسه بـ GET عادي **بلا `Range`** ويمررها لـ react-pdf كـ `ArrayBuffer` — فيُتجاوز مسار جلب pdfjs الداخلي كلياً، مع **إعادة محاولة واحدة عند 204** (`viewer.fetch_204`/`viewer.fetch_failed` في السجل). مُثبت e2e: جلب بلا `Range` + إعادة المحاولة، والتحقق الحي تحت dev بلا أخطاء كونسول. مُتراجع عنه بديلاً: `options={{ disableRange: true }}` كانت تُسقط العارض أحياناً (انهيار worker في pdfjs 5.4.296).
 
 ## [ORPHANS & PENDING]
 
