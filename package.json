@@ -1,0 +1,36 @@
+{
+  "name": "volunteer-team-site",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "preview": "node e2e/static-server.mjs",
+    "test:e2e": "set NEXT_PUBLIC_FORMSPREE_ENDPOINT=https://formspree.io/f/e2e-mock&& npm run build && npx playwright test",
+    "test:perf": "node e2e/lighthouse-run.cjs"
+  },
+  "dependencies": {
+    "next": "16.3.0",
+    "pdfjs-dist": "5.4.296",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-pdf": "10.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "lighthouse": "12.8.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  },
+  "browserslist": [
+    "chrome >= 100",
+    "edge >= 100",
+    "firefox >= 100",
+    "safari >= 15.4"
+  ]
+}
