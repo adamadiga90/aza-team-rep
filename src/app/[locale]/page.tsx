@@ -28,7 +28,7 @@ export default async function HomePage({
       <div>
         <div className='flex gap-1'>
         <span className='bg-[#f7bf00] font-bold text-[#1f372c] rounded-sm px-1'>{t('home.descriptionSpan')}</span>
-      <p className="text-lg text-gray-600 dark:text-gray-400">{t('home.descriptionP1')}</p>
+      <p className="text-lg text-gray-600 dark:text-gray-400">{t('home.description')}</p>
         </div>
       <p className="text-lg text-gray-600 dark:text-gray-400">{t('home.descriptionP2')}</p>
       </div>

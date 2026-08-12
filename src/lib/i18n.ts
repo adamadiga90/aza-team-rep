@@ -10,7 +10,7 @@ export const ui = {
     'nav.join': 'انضم إلينا',
     'home.title': 'AZA TEAM',
     'home.descriptionSpan': 'فريق آزا',
-    'home.descriptionP1': 'هو فريق شبابي تطوعي غير ربحي يعمل تحت مظلة الجمعية الخيرية الشركسية.',
+    'home.description': 'هو فريق شبابي تطوعي غير ربحي يعمل تحت مظلة الجمعية الخيرية الشركسية.',
     'home.descriptionP2': 'يجمع الشباب ويعمل على تطوير مهاراتهم، وخدمة المجتمع، والحفاظ على الهوية الثقافية، وإحداث تغيير وأثر إيجابي من خلال العمل التطوعي المنظم الاحترافي الهادف.',
     'home.goalsHeading': 'أهدافنا',
     'home.goalsSubheading': 'نعمل على تحقيق أهداف واضحة تصنع أثراً حقيقياً في المجتمع.',
@@ -108,18 +108,24 @@ export const ui = {
 {title: 'MEAL & IT', description: 'Manages AZA’s data systems, activity tracking, technology, and program evaluation. The department monitors project progress, measures impact, supports reliable data collection and analysis, and connects technical infrastructure with strategic planning, helping the team improve performance, maintain accurate reporting, and make informed decisions responsibly.'},
 {title: 'RND', description: 'Explores new activities, methods, and improvements that can strengthen AZA’s work. The department supports research teams, develops innovative ideas, connects concepts with practical implementation, and promotes smarter, more effective approaches so activities remain aligned with team goals and create meaningful community impact effectively.'},
 {title: 'Finance', description: 'Manages AZA’s financial records, funds, transactions, and internal controls. The department supports accurate daily accounting, financial analysis, timely reporting, and responsible compliance while connecting financial operations with team leadership, helping ensure that resources are managed carefully and activities remain organized, transparent, and sustainable.'},]
-
-  },
+  ,'team.goals': [
+    { title: 'Empowering youth:', description: 'Develop skills, talents, and leadership through training and practical opportunities.' },
+    { title: 'Preserving Circassian culture:', description: 'Support heritage, traditions, language, and values for future generations.' },
+    { title: 'Strengthening belonging and identity:', description: 'Build a strong sense of community and cultural connection.' },
+    { title: 'Creating community impact:', description: 'Encourage volunteering, teamwork, and initiatives that serve the community.' },
+    { title: 'Promoting professionalism:', description: 'Foster an organised, responsible, and continuously improving volunteer environment.' }
+  ],},
+  
 } as const;
 
 export type UiKey = keyof (typeof ui)['ar'];
 
 export type Department = { title: string; description: string };
 export type Goals = {title: string; description: string}
-export function getDepartments(locale: Locale): Department[] {
+export function getDepartments(locale: Locale): readonly Department[] {
   return ui[locale]['team.departments'];
 }
-export function getGoals(locale: Locale): Goals[] {
+export function getGoals(locale: Locale): readonly Goals[] {
   return ui[locale]['team.goals'];
 }
 
