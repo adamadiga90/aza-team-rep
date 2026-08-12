@@ -68,8 +68,9 @@ export const ui = {
     'nav.docs': 'Documents',
     'nav.join': 'Join Us',
     'home.title': 'Join our volunteer team',
-    'home.description':
-      'We are a volunteer team of 130 members working together to make a positive impact. Browse our documents to learn about our structure and code of conduct, then submit your application.',
+      'home.descriptionSpan': 'AZA Team',
+    'home.description':'is a non‑profit youth volunteer team operating under the Circassian Charitable Society.',
+     'home.descriptionP2': 'It brings young people together, develops their skills, serves the community, preserves cultural identity, and creates positive change through organised, professional, purposeful volunteer work.',
     'home.cta': 'Apply to join',
     'docs.heading': 'Documents',
     'docs.subheading': 'Team structure files, code of conduct, and other official documents. Click any document to view it on the site.',
