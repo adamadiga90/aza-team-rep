@@ -38,7 +38,7 @@ export default async function LocaleLayout({
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   return (
     <html lang={locale} dir={dir}>
-      <body className="min-h-screen bg-white text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
+      <body className="min-h-screen bg-white text-gray-900 antialiased dark:bg-[#041407] dark:text-[#f7bf00]">
         <Header locale={locale as Locale} />
         <main className="mx-auto w-full max-w-4xl px-4 py-12">{children}</main>
         <Footer locale={locale as Locale} />
